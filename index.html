@@ -73,6 +73,34 @@
         .flower:nth-child(9)  { transition-delay: 1.20s; }
         .flower:nth-child(10) { transition-delay: 1.35s; }
 
+        /* Quote styling */
+        #quote {
+            margin-top: 36px;
+            font-size: 1.4rem;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.45);
+            letter-spacing: 0.04em;
+            min-height: 2em;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #quote.visible {
+            opacity: 1;
+        }
+
+        .letter {
+            display: inline;
+            opacity: 0;
+            transition: opacity 0.08s ease;
+        }
+
+        .letter.show {
+            opacity: 1;
+        }
+
         @media (max-width: 800px) {
             .garden {
                 flex-wrap: wrap;
@@ -81,6 +109,9 @@
             .flower {
                 width: 100px;
                 height: 100px;
+            }
+            #quote {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -102,13 +133,52 @@
         <img class="flower" src="https://cdn.discordapp.com/attachments/883693879382134824/1511384714559361294/IMG_6925.jpg?ex=6a204234&is=6a1ef0b4&hm=9ba243f138a1b2b55e96fef51bf8d22224ffbcc843fbd59330e2e146606e1d19&" alt="Lily">
     </div>
 
+    <div id="quote"></div>
+
     <script>
         const btn = document.getElementById('bloomBtn');
         const garden = document.getElementById('garden');
+        const quoteEl = document.getElementById('quote');
+        const quoteText = "in a world full of roses, you will be my lily";
+
+        let typeTimeout = null;
+
+        function typeLetters() {
+            // Build spans for each character
+            quoteEl.innerHTML = '';
+            quoteEl.classList.add('visible');
+
+            const spans = [];
+            for (let i = 0; i < quoteText.length; i++) {
+                const span = document.createElement('span');
+                span.classList.add('letter');
+                span.textContent = quoteText[i] === ' ' ? '\u00A0' : quoteText[i];
+                quoteEl.appendChild(span);
+                spans.push(span);
+            }
+
+            // Stagger each letter appearing — start after last flower blooms (~1.9s)
+            spans.forEach((span, i) => {
+                setTimeout(() => span.classList.add('show'), 1900 + i * 55);
+            });
+        }
+
+        function hideQuote() {
+            quoteEl.classList.remove('visible');
+            quoteEl.innerHTML = '';
+            if (typeTimeout) clearTimeout(typeTimeout);
+        }
 
         btn.addEventListener('click', () => {
             garden.classList.toggle('bloom');
-            btn.textContent = garden.classList.contains('bloom') ? 'Hide Garden' : 'CLICK MEE';
+
+            if (garden.classList.contains('bloom')) {
+                btn.textContent = 'Hide Garden';
+                typeLetters();
+            } else {
+                btn.textContent = 'CLICK MEE';
+                hideQuote();
+            }
         });
     </script>
 
